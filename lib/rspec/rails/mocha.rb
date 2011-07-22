@@ -20,6 +20,14 @@ module RSpec
           true
         end
 
+
+        #add for mongomapper
+        def _id
+          id
+        end
+
+
+
         def respond_to?(message, include_private=false)
           message.to_s =~ /_before_type_cast$/ ? false : super
         end
