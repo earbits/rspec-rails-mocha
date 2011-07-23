@@ -69,6 +69,13 @@ describe "rspec-rails Mocha plugin" do
     it "should be new record when explicitly stated" do
       create(Person).as_new_record.should be_new_record
     end
+    
+    context "mongo mapper" do
+      it "should alias _id to id" do
+        person = create(Person)
+        person._id.should == person.id
+      end
+    end
   end
   
   describe "#mock_model" do

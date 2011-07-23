@@ -21,13 +21,6 @@ module RSpec
         end
 
 
-        #add for mongomapper
-        def _id
-          id
-        end
-
-
-
         def respond_to?(message, include_private=false)
           message.to_s =~ /_before_type_cast$/ ? false : super
         end
@@ -42,6 +35,21 @@ module RSpec
           send(key)
         end
 
+        def new_record?
+          !persisted?
+        end
+      end
+      
+      
+      module MongoMapperInstanceMethods
+        def [](key)
+          send(key)
+        end
+        
+        def _id
+          self.id
+        end        
+        
         def new_record?
           !persisted?
         end
@@ -108,6 +116,14 @@ EOM
               end
             end
           end
+          if true  # mongo mapper
+            m.extend MongoMapperInstanceMethods 
+            [:save, :update_attributes].each do |key|
+              if stubs[key] == false
+                m.errors.stubs(:empty? => false)
+              end
+            end
+          end
           m.instance_eval(<<-CODE, __FILE__, __LINE__)
             def is_a?(other)
               #{model_class}.ancestors.include?(other)
@@ -157,6 +173,21 @@ EOM
           raise IllegalDataAccessException.new("stubbed models are not allowed to access the database")
         end
       end
+      
+      
+      module MongoMapperStubExtensions
+        def as_new_record
+          self.stubs(:persisted? => false, :id => nil)
+          self
+        end
+
+        def persisted?
+          true
+        end
+        def _id
+          id
+        end
+      end
 
       # :call-seq:
       #   stub_model(Model)
@@ -196,6 +227,7 @@ EOM
       def stub_model(model_class, stubs={})
         model_class.new.tap do |m|
           m.extend ActiveModelStubExtensions
+          m.extend MongoMapperStubExtensions if true
           if defined?(ActiveRecord) && model_class < ActiveRecord::Base
             m.extend ActiveRecordStubExtensions
             primary_key = model_class.primary_key.to_sym
