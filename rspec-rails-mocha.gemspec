@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
   gem.summary = "Mocha versions of mock_model and stub_model from rspec-rails"
   gem.description = "Ports functionality of mock_model and stub_model from rspec-rails using Mocha."
 
-  gem.authors  = ['Mislav Marohnić', 'Paul Rosania']
+  gem.authors  = ['Mislav Marohni', 'Paul Rosania']
   gem.email    = 'mislav.marohnic@gmail.com'
   gem.homepage = 'http://github.com/mislav/rspec-rails-mocha'
 
